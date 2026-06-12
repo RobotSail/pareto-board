@@ -56,6 +56,7 @@ h1{font-size:22px;font-weight:600;letter-spacing:-.02em}
 @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
 .card.dragging{opacity:.4}
+.card.pop-open{z-index:40}
 .card .row1{display:flex;align-items:center;gap:8px;margin-bottom:9px;flex-wrap:wrap}
 .card .prnum{font-size:14px;font-weight:600;letter-spacing:-.01em}
 .card .prnum a{text-decoration:none;color:var(--accent)}
@@ -401,6 +402,11 @@ function bindDnD(){
   });
 });
 
+function closePops(){
+  document.querySelectorAll(".pop").forEach(p=>p.remove());
+  document.querySelectorAll(".card.pop-open").forEach(c=>c.classList.remove("pop-open"));
+}
+
 document.addEventListener("click", async e => {
   const opt = e.target.closest(".pop .opt");
   if(opt){
@@ -408,7 +414,7 @@ document.addEventListener("click", async e => {
     else { opt.parentElement.querySelectorAll(".opt").forEach(o=>o.classList.remove("sel")); opt.classList.add("sel"); }
     return;
   }
-  if(e.target.closest(".p-cancel")){ document.querySelectorAll(".pop").forEach(p=>p.remove()); return; }
+  if(e.target.closest(".p-cancel")){ closePops(); return; }
   const apply = e.target.closest(".p-apply");
   if(apply){
     const pop = apply.closest(".pop");
@@ -423,7 +429,7 @@ document.addEventListener("click", async e => {
       if(flags.includes(f) && !item.flags.includes(f)) add.push(f);
       if(!flags.includes(f) && item.flags.includes(f)) remove.push(f);
     }
-    if(!add.length && !remove.length){ pop.remove(); return; }
+    if(!add.length && !remove.length){ closePops(); return; }
     apply.disabled = true; apply.textContent = "Applying…";
     try{
       await api("/api/labels", {method:"POST", body:JSON.stringify({num, add, remove})});
@@ -437,9 +443,11 @@ document.addEventListener("click", async e => {
   if(!b) return;
   const num = Number(b.dataset.num);
   if(b.dataset.act === "classify"){
-    document.querySelectorAll(".pop").forEach(p=>p.remove());
+    closePops();
     const item = [...PRS, ...ISSUES].find(p => p.num === num);
-    b.closest(".card").insertAdjacentHTML("beforeend", classifyPop(item));
+    const card = b.closest(".card");
+    card.classList.add("pop-open");
+    card.insertAdjacentHTML("beforeend", classifyPop(item));
     return;
   }
   if(b.dataset.act === "back") setBucket(num, null);
