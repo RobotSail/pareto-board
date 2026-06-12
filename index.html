@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pareto Board</title>
+<style>
+:root{
+  --bg:#f5f5f7; --surface:#ffffff; --ink:#1d1d1f; --ink-2:#6e6e73; --ink-3:#aeaeb2;
+  --hairline:rgba(0,0,0,.08); --accent:#0071e3; --amber:#b25000; --red:#d70015;
+  --intent:#af52de; --execution:#007aff; --judgment:#ff9500; --learning:#34c759;
+  --interface:#5ac8fa; --unclassified:#8e8e93; --radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{background:var(--bg)}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100vh}
+a{color:inherit}
+header{position:sticky;top:0;z-index:20;background:rgba(245,245,247,.78);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--hairline)}
+.header-inner{max-width:1280px;margin:0 auto;padding:18px 32px;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
+h1{font-size:24px;font-weight:600;letter-spacing:-.02em}
+.subtitle{font-size:13px;color:var(--ink-2);margin-top:1px}
+.subtitle .live{color:var(--accent)}
+.meter{margin-left:auto;min-width:300px}
+.meter .m-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.meter .m-label{font-size:13px;font-weight:600;letter-spacing:-.01em}
+.meter .m-label span{color:var(--ink-2);font-weight:400}
+.meter .m-status{font-size:12px;color:var(--ink-2)}
+.meter .m-status.warn{color:var(--amber)}
+.meter .m-status.over{color:var(--red)}
+.bar{position:relative;height:4px;border-radius:2px;background:rgba(0,0,0,.08)}
+.bar .fill{position:absolute;inset:0 auto 0 0;width:0%;border-radius:2px;background:var(--accent);transition:width .4s cubic-bezier(.3,.8,.3,1)}
+.bar .fill.over{background:var(--red)}
+.bar .tick{position:absolute;top:-3px;bottom:-3px;left:20%;width:1px;background:var(--ink-3)}
+.meter .m-sub{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-3);margin-top:6px}
+.layout{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:36px;padding:32px;align-items:start}
+@media (max-width:1024px){.layout{grid-template-columns:1fr}}
+.bay{margin-bottom:40px}
+.bay-head{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
+.bay-head .dot{width:9px;height:9px;border-radius:50%;background:var(--bay-c);align-self:center}
+.bay-head h2{font-size:19px;font-weight:600;letter-spacing:-.02em}
+.bay-head .count{font-size:13px;color:var(--ink-3)}
+.bay-head .desc{font-size:12px;color:var(--ink-2);margin-left:auto}
+@media (max-width:700px){.bay-head .desc{display:none}}
+.bay-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
+.bay-empty{font-size:13px;color:var(--ink-3);text-align:center;padding:18px;border:1px dashed rgba(0,0,0,.12);border-radius:var(--radius)}
+.card{background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius);padding:16px 16px 12px;cursor:grab;box-shadow:0 1px 2px rgba(0,0,0,.04);transition:transform .2s cubic-bezier(.3,.8,.3,1),box-shadow .2s;animation:rise .45s cubic-bezier(.3,.8,.3,1) both;animation-delay:var(--d,0ms)}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.card:active{cursor:grabbing}
+.card.dragging{opacity:.4}
+.card .row1{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.card .prnum{font-size:14px;font-weight:600;letter-spacing:-.01em}
+.card .prnum a{text-decoration:none;color:var(--accent)}
+.card .prnum a:hover{text-decoration:underline}
+.pill{font-size:11px;font-weight:500;color:var(--ink-2);background:rgba(0,0,0,.05);border-radius:99px;padding:3px 9px}
+.pill.competing{color:var(--red);background:rgba(215,0,21,.07)}
+.pill.door{color:var(--amber);background:rgba(178,80,0,.09)}
+.card .ext{margin-left:auto;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;text-decoration:none;color:var(--ink-3);font-size:13px;transition:.15s}
+.card .ext:hover{background:rgba(0,0,0,.05);color:var(--ink)}
+.card .title{font-size:14px;font-weight:600;letter-spacing:-.01em;line-height:1.4;margin-bottom:5px}
+.card .desc{font-size:12.5px;line-height:1.55;color:var(--ink-2)}
+.card .row2{display:flex;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--hairline)}
+.card .author{font-size:12px;color:var(--ink-3)}
+.card .btns{margin-left:auto;display:flex;gap:6px}
+.card .btns button{font-family:inherit;font-size:12px;font-weight:500;border:none;border-radius:99px;padding:5px 12px;cursor:pointer;transition:.15s}
+button.b-now{background:var(--accent);color:#fff}
+button.b-now:hover{background:#0077ed;transform:scale(1.03)}
+button.b-hold{background:rgba(0,0,0,.05);color:var(--ink)}
+button.b-hold:hover{background:rgba(0,0,0,.09)}
+.zones{position:sticky;top:96px;display:flex;flex-direction:column;gap:18px}
+@media (max-width:1024px){.zones{position:static}}
+.zone{background:var(--surface);border:1px solid var(--hairline);border-radius:18px;overflow:hidden;transition:box-shadow .2s,border-color .2s;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.zone.dragover{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,113,227,.15)}
+.zone .z-head{display:flex;align-items:baseline;padding:14px 18px 0}
+.zone h3{font-size:16px;font-weight:600;letter-spacing:-.01em}
+.zone .z-count{margin-left:auto;font-size:13px;color:var(--ink-3)}
+.zone .z-sub{font-size:12px;color:var(--ink-2);padding:2px 18px 0}
+.zone .z-body{padding:12px;display:flex;flex-direction:column;gap:6px;min-height:96px}
+.zone .z-hint{font-size:12px;color:var(--ink-3);text-align:center;margin:auto;padding:20px 8px}
+.zone .quota{font-size:11px;color:var(--ink-3);padding:0 18px 13px}
+.zone .quota b{font-weight:600;color:var(--ink-2)}
+.zone.over-quota .quota b{color:var(--red)}
+.mini{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:10px;padding:8px 10px;font-size:12.5px;cursor:grab;animation:rise .25s ease both}
+.mini .dot{width:7px;height:7px;border-radius:50%;background:var(--stage-c);flex:0 0 auto}
+.mini .prnum{font-weight:600;min-width:38px}
+.mini .t{flex:1;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini a{color:var(--ink-3);text-decoration:none;font-size:12px}
+.mini a:hover{color:var(--accent)}
+.mini button{background:none;border:none;color:var(--ink-3);cursor:pointer;font-family:inherit;font-size:14px;line-height:1;padding:0 2px;border-radius:4px}
+.mini button:hover{color:var(--red)}
+.toolbar{display:flex;gap:10px}
+.toolbar button{flex:1;font-family:inherit;font-size:12.5px;font-weight:500;padding:9px 8px;border-radius:99px;border:1px solid var(--hairline);background:var(--surface);color:var(--ink);cursor:pointer;transition:.15s}
+.toolbar button:hover{background:rgba(0,0,0,.04)}
+.toast{position:fixed;bottom:28px;left:50%;transform:translate(-50%,80px);background:rgba(29,29,31,.92);color:#fff;font-size:13px;font-weight:500;padding:10px 20px;border-radius:99px;transition:transform .3s cubic-bezier(.3,.8,.3,1);backdrop-filter:blur(10px);z-index:50}
+.toast.show{transform:translate(-50%,0)}
+.loading{max-width:1280px;margin:80px auto;text-align:center;color:var(--ink-3);font-size:14px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div>
+      <h1>Pareto Board</h1>
+      <div class="subtitle" id="subtitle">loading…</div>
+    </div>
+    <div class="meter">
+      <div class="m-row">
+        <div class="m-label"><span id="g-now">0</span> of <span id="g-total">0</span> <span>in Review now</span></div>
+        <div class="m-status" id="g-status">Within recommendation</div>
+      </div>
+      <div class="bar"><div class="fill" id="g-fill"></div><div class="tick"></div></div>
+      <div class="m-sub"><span>Recommended: at most <b id="g-target">—</b> (20%)</span><span id="g-unsorted"></span></div>
+    </div>
+  </div>
+</header>
+
+<div class="layout" style="display:none" id="layout">
+  <main id="bays"></main>
+  <aside class="zones">
+    <section class="zone" id="zone-now" data-bucket="now">
+      <div class="z-head"><h3>Review now</h3><span class="z-count" id="c-now">0</span></div>
+      <div class="z-sub">The few that matter</div>
+      <div class="z-body" id="body-now"><div class="z-hint">Drag cards here</div></div>
+      <div class="quota" id="quota-now"></div>
+    </section>
+    <section class="zone" id="zone-hold" data-bucket="hold">
+      <div class="z-head"><h3>Hold</h3><span class="z-count" id="c-hold">0</span></div>
+      <div class="z-sub">Everything that can wait</div>
+      <div class="z-body" id="body-hold"><div class="z-hint">Drag cards here</div></div>
+      <div class="quota">No limit</div>
+    </section>
+    <div class="toolbar">
+      <button id="btn-refresh">Refresh</button>
+      <button id="btn-export">Copy report</button>
+      <button id="btn-reset">Reset</button>
+    </div>
+  </aside>
+</div>
+<div class="loading" id="loading">Loading open pull requests…</div>
+
+<div class="toast" id="toast">Report copied</div>
+
+<script>
+const STAGES = {
+  intent:       {name:"Intent",       c:"var(--intent)",       desc:"capturing & protecting what the user wants"},
+  execution:    {name:"Execution",    c:"var(--execution)",    desc:"running agents — runners, dispatch, plumbing"},
+  judgment:     {name:"Judgment",     c:"var(--judgment)",     desc:"deciding what is true & what gets kept"},
+  learning:     {name:"Learning",     c:"var(--learning)",     desc:"what the factory retains & propagates"},
+  interface:    {name:"Interface",    c:"var(--interface)",    desc:"how humans drive it"},
+  unclassified: {name:"Unclassified", c:"var(--unclassified)", desc:"no stage label yet"},
+};
+
+let PRS = [];
+let REPO = "";
+let state = {};
+let serverMode = true;
+const LS_KEY = "rf-pr-buckets-v1";
+const $ = s => document.querySelector(s);
+const TARGET = () => Math.max(1, Math.ceil(PRS.length * 0.2));
+
+async function loadState(){
+  try{
+    const r = await fetch("/api/state");
+    if(!r.ok) throw 0;
+    state = await r.json();
+  }catch(_){
+    serverMode = false;
+    state = JSON.parse(localStorage.getItem(LS_KEY) || "{}");
+  }
+}
+let saveTimer = null;
+function save(){
+  if(serverMode){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => fetch("/api/state", {method:"POST", body:JSON.stringify(state)}).catch(()=>{}), 250);
+  } else {
+    localStorage.setItem(LS_KEY, JSON.stringify(state));
+  }
+}
+
+async function loadPRs(){
+  const r = await fetch("/api/prs");
+  const data = await r.json();
+  if(data.error) throw new Error(data.error);
+  PRS = data.prs;
+  REPO = data.repo;
+  // drop state entries for PRs that closed
+  const live = new Set(PRS.map(p => String(p.num)));
+  for(const k of Object.keys(state)) if(!live.has(k)) delete state[k];
+}
+
+function flagChip(f){
+  if(f === "competing")    return `<span class="pill competing">Duplicate set</span>`;
+  if(f === "one-way-door") return `<span class="pill door">Owner call</span>`;
+  return "";
+}
+
+function cardHTML(p, i){
+  return `<article class="card" draggable="true" data-num="${p.num}" style="--d:${i*30}ms">
+    <div class="row1">
+      <span class="prnum"><a href="${p.url}" target="_blank" rel="noopener">#${p.num}</a></span>
+      ${p.kind ? `<span class="pill">${p.kind}</span>` : ""}
+      ${p.flags.map(flagChip).join("")}
+      <a class="ext" href="${p.url}" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+    </div>
+    <div class="title">${esc(p.title)}</div>
+    <div class="desc">${esc(p.desc)}</div>
+    <div class="row2">
+      <span class="author">${esc(p.author)}</span>
+      <span class="btns">
+        <button class="b-hold" data-act="hold" data-num="${p.num}">Hold</button>
+        <button class="b-now" data-act="now" data-num="${p.num}">Review</button>
+      </span>
+    </div>
+  </article>`;
+}
+
+function miniHTML(p){
+  const c = (STAGES[p.stage] || STAGES.unclassified).c;
+  return `<div class="mini" draggable="true" data-num="${p.num}" style="--stage-c:${c}">
+    <span class="dot"></span>
+    <span class="prnum">#${p.num}</span>
+    <span class="t">${esc(p.title)}</span>
+    <a href="${p.url}" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+    <button data-act="back" data-num="${p.num}" title="Send back">✕</button>
+  </div>`;
+}
+
+function esc(s){ return String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+function render(){
+  $("#subtitle").innerHTML = `${esc(REPO)} · <span class="live">live</span> · sort into Review now or Hold`;
+  let html = "";
+  for(const [key, s] of Object.entries(STAGES)){
+    const all = PRS.filter(p => (p.stage === key) || (key === "unclassified" && !STAGES[p.stage]));
+    if(!all.length) continue;
+    const items = all.filter(p => !state[p.num]);
+    html += `<section class="bay" style="--bay-c:${s.c}">
+      <div class="bay-head"><span class="dot"></span><h2>${s.name}</h2><span class="count">${items.length} of ${all.length}</span><span class="desc">${s.desc}</span></div>
+      ${items.length
+        ? `<div class="bay-cards">${items.map((p,i)=>cardHTML(p,i)).join("")}</div>`
+        : `<div class="bay-empty">All sorted</div>`}
+    </section>`;
+  }
+  $("#bays").innerHTML = html;
+
+  const nows  = PRS.filter(p => state[p.num] === "now");
+  const holds = PRS.filter(p => state[p.num] === "hold");
+  $("#body-now").innerHTML  = nows.length  ? nows.map(miniHTML).join("")  : `<div class="z-hint">Drag cards here</div>`;
+  $("#body-hold").innerHTML = holds.length ? holds.map(miniHTML).join("") : `<div class="z-hint">Drag cards here</div>`;
+  $("#c-now").textContent  = nows.length;
+  $("#c-hold").textContent = holds.length;
+  $("#quota-now").innerHTML = `<b>${nows.length} of ${TARGET()}</b> recommended`;
+  $("#zone-now").classList.toggle("over-quota", nows.length > TARGET());
+
+  const pct = PRS.length ? (nows.length / PRS.length) * 100 : 0;
+  $("#g-now").textContent = nows.length;
+  $("#g-total").textContent = PRS.length;
+  $("#g-target").textContent = TARGET();
+  const fill = $("#g-fill");
+  fill.style.width = Math.min(pct, 100) + "%";
+  fill.classList.toggle("over", nows.length > TARGET());
+  $("#g-unsorted").textContent = `${PRS.length - nows.length - holds.length} unsorted`;
+  const st = $("#g-status");
+  st.classList.remove("warn","over");
+  if(nows.length > TARGET()){ st.classList.add("over"); st.textContent = "Over recommendation — consider trimming"; }
+  else if(nows.length === TARGET()){ st.classList.add("warn"); st.textContent = "At recommendation"; }
+  else { st.textContent = "Within recommendation"; }
+
+  bindDnD();
+}
+
+function setBucket(num, bucket){
+  if(bucket) state[num] = bucket; else delete state[num];
+  save(); render();
+}
+
+function bindDnD(){
+  document.querySelectorAll("[draggable]").forEach(el => {
+    el.addEventListener("dragstart", e => {
+      e.dataTransfer.setData("text/plain", el.dataset.num);
+      el.classList.add("dragging");
+    });
+    el.addEventListener("dragend", () => el.classList.remove("dragging"));
+  });
+}
+
+document.addEventListener("click", e => {
+  const b = e.target.closest("button[data-act]");
+  if(!b) return;
+  const {act, num} = b.dataset;
+  setBucket(num, act === "back" ? null : act);
+});
+
+[["#zone-now","now"],["#zone-hold","hold"],["#bays",null]].forEach(([sel, bucket]) => {
+  const el = document.querySelector(sel);
+  el.addEventListener("dragover", e => { e.preventDefault(); el.classList && el.classList.add("dragover"); });
+  el.addEventListener("dragleave", () => el.classList && el.classList.remove("dragover"));
+  el.addEventListener("drop", e => {
+    e.preventDefault(); el.classList && el.classList.remove("dragover");
+    const num = e.dataTransfer.getData("text/plain");
+    if(num) setBucket(num, bucket);
+  });
+});
+
+$("#btn-reset").addEventListener("click", () => {
+  if(confirm("Clear all sorting and start over?")){ state = {}; save(); render(); }
+});
+$("#btn-refresh").addEventListener("click", async () => {
+  await loadPRs().catch(()=>{}); render();
+});
+
+$("#btn-export").addEventListener("click", async () => {
+  const d = new Date().toISOString().slice(0,10);
+  const nows  = PRS.filter(p => state[p.num] === "now");
+  const holds = PRS.filter(p => state[p.num] === "hold");
+  const uns   = PRS.filter(p => !state[p.num]);
+  const line = p => `- #${p.num} [${p.stage}${p.kind ? "/" + p.kind : ""}${p.flags.length ? " · " + p.flags.join(",") : ""}] ${p.title} — ${p.url}`;
+  const md = `# ${REPO} PR triage — review now vs hold (${d})\n\n` +
+    `## Review now (${nows.length} / target ≤${TARGET()})\n${nows.map(line).join("\n") || "- (none)"}\n\n` +
+    `## Hold (${holds.length})\n${holds.map(line).join("\n") || "- (none)"}\n\n` +
+    (uns.length ? `## Unsorted (${uns.length})\n${uns.map(line).join("\n")}\n` : "");
+  await navigator.clipboard.writeText(md);
+  const t = $("#toast"); t.classList.add("show"); setTimeout(()=>t.classList.remove("show"), 1600);
+});
+
+(async function init(){
+  await loadState();
+  try{
+    await loadPRs();
+    $("#loading").style.display = "none";
+    $("#layout").style.display = "";
+    render();
+  }catch(e){
+    $("#loading").textContent = "Couldn't load PRs: " + e.message + " — is server.py running?";
+  }
+})();
+</script>
+</body>
+</html>
