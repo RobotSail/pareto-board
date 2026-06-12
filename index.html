@@ -64,6 +64,7 @@ h1{font-size:22px;font-weight:600;letter-spacing:-.02em}
 .pill{font-size:11px;font-weight:500;color:var(--ink-2);background:rgba(0,0,0,.05);border-radius:99px;padding:3px 9px}
 .pill.competing{color:var(--red);background:rgba(215,0,21,.07)}
 .pill.door{color:var(--amber);background:rgba(178,80,0,.09)}
+.pill.other{color:var(--ink-3);background:rgba(0,0,0,.035)}
 .card .ext{margin-left:auto;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;text-decoration:none;color:var(--ink-3);font-size:13px;transition:.15s}
 .card .ext:hover{background:rgba(0,0,0,.05);color:var(--ink)}
 .card .title{font-size:14px;font-weight:600;letter-spacing:-.01em;line-height:1.4;margin-bottom:5px}
@@ -231,6 +232,11 @@ async function loadAll(){
   for(const k of Object.keys(SESSION.buckets)) if(!live.has(k)) delete SESSION.buckets[k];
 }
 
+function otherLabels(p){
+  return (p.labels || []).filter(l =>
+    !l.startsWith("stage:") && !l.startsWith("kind:") && !FLAGS.includes(l));
+}
+
 function flagChip(f){
   if(f === "competing")    return `<span class="pill competing">Duplicate set</span>`;
   if(f === "one-way-door") return `<span class="pill door">Owner call</span>`;
@@ -260,6 +266,7 @@ function cardHTML(p, i, opts={}){
       <span class="prnum"><a href="${p.url}" target="_blank" rel="noopener">#${p.num}</a></span>
       ${p.kind ? `<span class="pill">${esc(p.kind)}</span>` : ""}
       ${p.flags.map(flagChip).join("")}
+      ${otherLabels(p).map(l => `<span class="pill other">${esc(l)}</span>`).join("")}
       <a class="ext" href="${p.url}" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
     </div>
     <div class="title">${esc(p.title)}</div>
