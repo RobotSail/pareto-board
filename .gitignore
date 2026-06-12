@@ -1,3 +1,5 @@
 state.json
+state.json.imported
+sessions/
 __pycache__/
 .DS_Store

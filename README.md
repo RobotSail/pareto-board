@@ -5,9 +5,6 @@ stage of the pipeline they touch. You drag each one into **Review now** or
 **Hold**. A quiet meter keeps you honest about the 80/20 rule: only ~20% of
 the backlog belongs in Review now.
 
-Classification comes live from the repo's `stage:` / `kind:` labels, so the
-board stays current as PRs open, close, and get relabeled.
-
 ## Run it
 
 ```bash
@@ -16,14 +13,30 @@ python3 server.py
 
 That's it — it opens http://localhost:8417. No dependencies beyond Python 3.
 
+## How it works
+
+**Triage sessions are ephemeral.** Each session is one sorting pass over the
+currently open PRs. Hit *Finish session* and it's archived; the next session
+starts with empty buckets. The History tab lists every past session and shows
+exactly how PRs were bucketed, from a snapshot taken at sort time — so history
+stays readable even after those PRs close.
+
+**Labels are permanent.** Classifying a card (*Classify* / *Edit labels*)
+applies real `stage:` / `kind:` / flag labels to the PR or issue on GitHub,
+using your credentials. New PRs and issues arrive under **Uncategorized**
+until you classify them. The Issues tab is for labeling only — sessions and
+buckets are a PR thing.
+
+**Descriptions** come from `meta.json` when curated; anything else shows
+"Description not yet generated."
+
 ## Auth
 
-For private repos or to avoid anonymous rate limits, the server looks for a
-token in this order:
+Writes (labels) and reads use, in order:
 
-1. `GITHUB_TOKEN` env var
-2. `gh auth token` (if you use the GitHub CLI, this just works)
-3. anonymous (fine for public repos, 60 requests/hour)
+1. the `gh` CLI's stored credentials (`gh auth token`) — if you use gh, this just works
+2. `GITHUB_TOKEN` env var (classic PAT with `repo` scope, or fine-grained with issues read/write)
+3. anonymous (read-only, public repos, rate-limited)
 
 ## Config
 
@@ -32,19 +45,22 @@ PB_REPO=owner/repo python3 server.py   # track a different repo
 PB_PORT=9000 python3 server.py         # different port
 ```
 
-## State
+## Data layout
 
-Your sorting lives in `state.json` next to the server (gitignored):
-
-```json
-{ "514": "now", "493": "hold" }
+```
+sessions/20260611-143027.json   # one file per triage session (gitignored)
+meta.json                       # optional curated per-PR descriptions
 ```
 
-Delete it (or hit Reset in the UI) to start over. If you open `index.html`
-directly without the server, the board falls back to localStorage.
+A session file:
 
-## Curated descriptions
-
-`meta.json` holds optional per-PR descriptions (plain-language "what it does /
-what it enables"). PRs without an entry fall back to the first line of their
-GitHub description.
+```json
+{
+  "id": "20260611-143027",
+  "repo": "owner/repo",
+  "started_at": 1781234567.0,
+  "finished_at": null,
+  "buckets": { "514": "now", "493": "hold" },
+  "snapshot": { "514": { "title": "…", "stage": "judgment", "url": "…" } }
+}
+```

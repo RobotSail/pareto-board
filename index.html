@@ -9,32 +9,39 @@
   --bg:#f5f5f7; --surface:#ffffff; --ink:#1d1d1f; --ink-2:#6e6e73; --ink-3:#aeaeb2;
   --hairline:rgba(0,0,0,.08); --accent:#0071e3; --amber:#b25000; --red:#d70015;
   --intent:#af52de; --execution:#007aff; --judgment:#ff9500; --learning:#34c759;
-  --interface:#5ac8fa; --unclassified:#8e8e93; --radius:14px;
+  --interface:#5ac8fa; --uncategorized:#8e8e93; --radius:14px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{background:var(--bg)}
 body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;min-height:100vh}
 a{color:inherit}
 header{position:sticky;top:0;z-index:20;background:rgba(245,245,247,.78);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--hairline)}
-.header-inner{max-width:1280px;margin:0 auto;padding:18px 32px;display:flex;align-items:center;gap:32px;flex-wrap:wrap}
-h1{font-size:24px;font-weight:600;letter-spacing:-.02em}
-.subtitle{font-size:13px;color:var(--ink-2);margin-top:1px}
-.subtitle .live{color:var(--accent)}
-.meter{margin-left:auto;min-width:300px}
-.meter .m-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.header-inner{max-width:1280px;margin:0 auto;padding:16px 32px;display:flex;align-items:center;gap:24px;flex-wrap:wrap}
+h1{font-size:22px;font-weight:600;letter-spacing:-.02em}
+.subtitle{font-size:12px;color:var(--ink-2);margin-top:1px}
+.tabs{display:flex;background:rgba(0,0,0,.06);border-radius:99px;padding:3px;gap:2px}
+.tabs button{font-family:inherit;font-size:13px;font-weight:500;border:none;background:transparent;color:var(--ink-2);padding:6px 16px;border-radius:99px;cursor:pointer;transition:.18s}
+.tabs button.active{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.meter{margin-left:auto;min-width:280px}
+.meter .m-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:5px}
 .meter .m-label{font-size:13px;font-weight:600;letter-spacing:-.01em}
 .meter .m-label span{color:var(--ink-2);font-weight:400}
-.meter .m-status{font-size:12px;color:var(--ink-2)}
+.meter .m-status{font-size:11px;color:var(--ink-2)}
 .meter .m-status.warn{color:var(--amber)}
 .meter .m-status.over{color:var(--red)}
 .bar{position:relative;height:4px;border-radius:2px;background:rgba(0,0,0,.08)}
 .bar .fill{position:absolute;inset:0 auto 0 0;width:0%;border-radius:2px;background:var(--accent);transition:width .4s cubic-bezier(.3,.8,.3,1)}
 .bar .fill.over{background:var(--red)}
 .bar .tick{position:absolute;top:-3px;bottom:-3px;left:20%;width:1px;background:var(--ink-3)}
-.meter .m-sub{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-3);margin-top:6px}
-.layout{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:36px;padding:32px;align-items:start}
+.meter .m-sub{display:flex;justify-content:space-between;font-size:11px;color:var(--ink-3);margin-top:5px}
+.session-bar{max-width:1280px;margin:0 auto;padding:10px 32px 0;display:flex;align-items:center;gap:14px;font-size:12.5px;color:var(--ink-2)}
+.session-bar .dot{width:7px;height:7px;border-radius:50%;background:var(--learning)}
+.session-bar button{font-family:inherit;font-size:12px;font-weight:500;border:1px solid var(--hairline);background:var(--surface);color:var(--ink);border-radius:99px;padding:5px 14px;cursor:pointer;transition:.15s;margin-left:auto}
+.session-bar button:hover{background:rgba(0,0,0,.04)}
+.layout{max-width:1280px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:36px;padding:24px 32px;align-items:start}
 @media (max-width:1024px){.layout{grid-template-columns:1fr}}
-.bay{margin-bottom:40px}
+.layout.single{grid-template-columns:1fr}
+.bay{margin-bottom:38px}
 .bay-head{display:flex;align-items:baseline;gap:10px;margin-bottom:14px}
 .bay-head .dot{width:9px;height:9px;border-radius:50%;background:var(--bay-c);align-self:center}
 .bay-head h2{font-size:19px;font-weight:600;letter-spacing:-.02em}
@@ -43,12 +50,13 @@ h1{font-size:24px;font-weight:600;letter-spacing:-.02em}
 @media (max-width:700px){.bay-head .desc{display:none}}
 .bay-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px}
 .bay-empty{font-size:13px;color:var(--ink-3);text-align:center;padding:18px;border:1px dashed rgba(0,0,0,.12);border-radius:var(--radius)}
-.card{background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius);padding:16px 16px 12px;cursor:grab;box-shadow:0 1px 2px rgba(0,0,0,.04);transition:transform .2s cubic-bezier(.3,.8,.3,1),box-shadow .2s;animation:rise .45s cubic-bezier(.3,.8,.3,1) both;animation-delay:var(--d,0ms)}
+.card{position:relative;background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius);padding:16px 16px 12px;box-shadow:0 1px 2px rgba(0,0,0,.04);transition:transform .2s cubic-bezier(.3,.8,.3,1),box-shadow .2s;animation:rise .45s cubic-bezier(.3,.8,.3,1) both;animation-delay:var(--d,0ms)}
+.card[draggable=true]{cursor:grab}
+.card[draggable=true]:active{cursor:grabbing}
 @keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
-.card:active{cursor:grabbing}
 .card.dragging{opacity:.4}
-.card .row1{display:flex;align-items:center;gap:8px;margin-bottom:9px}
+.card .row1{display:flex;align-items:center;gap:8px;margin-bottom:9px;flex-wrap:wrap}
 .card .prnum{font-size:14px;font-weight:600;letter-spacing:-.01em}
 .card .prnum a{text-decoration:none;color:var(--accent)}
 .card .prnum a:hover{text-decoration:underline}
@@ -59,7 +67,8 @@ h1{font-size:24px;font-weight:600;letter-spacing:-.02em}
 .card .ext:hover{background:rgba(0,0,0,.05);color:var(--ink)}
 .card .title{font-size:14px;font-weight:600;letter-spacing:-.01em;line-height:1.4;margin-bottom:5px}
 .card .desc{font-size:12.5px;line-height:1.55;color:var(--ink-2)}
-.card .row2{display:flex;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--hairline)}
+.card .desc.placeholder{color:var(--ink-3);font-style:italic}
+.card .row2{display:flex;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--hairline);gap:6px}
 .card .author{font-size:12px;color:var(--ink-3)}
 .card .btns{margin-left:auto;display:flex;gap:6px}
 .card .btns button{font-family:inherit;font-size:12px;font-weight:500;border:none;border-radius:99px;padding:5px 12px;cursor:pointer;transition:.15s}
@@ -67,6 +76,20 @@ button.b-now{background:var(--accent);color:#fff}
 button.b-now:hover{background:#0077ed;transform:scale(1.03)}
 button.b-hold{background:rgba(0,0,0,.05);color:var(--ink)}
 button.b-hold:hover{background:rgba(0,0,0,.09)}
+button.b-classify{background:transparent;color:var(--accent);border:1px solid rgba(0,113,227,.35)!important}
+button.b-classify:hover{background:rgba(0,113,227,.06)}
+.pop{position:absolute;left:10px;right:10px;top:calc(100% - 6px);z-index:30;background:var(--surface);border:1px solid var(--hairline);border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,.16);padding:13px 14px;animation:rise .2s ease both}
+.pop .p-row{margin-bottom:9px}
+.pop .p-row:last-child{margin-bottom:0}
+.pop .p-cap{font-size:10.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3);margin-bottom:5px}
+.pop .opts{display:flex;flex-wrap:wrap;gap:5px}
+.pop .opt{font-family:inherit;font-size:11.5px;font-weight:500;border:1px solid var(--hairline);background:var(--surface);color:var(--ink-2);border-radius:99px;padding:4px 11px;cursor:pointer;transition:.12s}
+.pop .opt.sel{background:var(--ink);border-color:var(--ink);color:#fff}
+.pop .p-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:11px}
+.pop .p-actions button{font-family:inherit;font-size:12px;font-weight:500;border:none;border-radius:99px;padding:6px 14px;cursor:pointer}
+.pop .p-cancel{background:rgba(0,0,0,.05);color:var(--ink)}
+.pop .p-apply{background:var(--accent);color:#fff}
+.pop .p-apply:disabled{opacity:.5;cursor:default}
 .zones{position:sticky;top:96px;display:flex;flex-direction:column;gap:18px}
 @media (max-width:1024px){.zones{position:static}}
 .zone{background:var(--surface);border:1px solid var(--hairline);border-radius:18px;overflow:hidden;transition:box-shadow .2s,border-color .2s;box-shadow:0 1px 2px rgba(0,0,0,.04)}
@@ -81,6 +104,7 @@ button.b-hold:hover{background:rgba(0,0,0,.09)}
 .zone .quota b{font-weight:600;color:var(--ink-2)}
 .zone.over-quota .quota b{color:var(--red)}
 .mini{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:10px;padding:8px 10px;font-size:12.5px;cursor:grab;animation:rise .25s ease both}
+.mini.ro{cursor:default}
 .mini .dot{width:7px;height:7px;border-radius:50%;background:var(--stage-c);flex:0 0 auto}
 .mini .prnum{font-weight:600;min-width:38px}
 .mini .t{flex:1;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -91,6 +115,24 @@ button.b-hold:hover{background:rgba(0,0,0,.09)}
 .toolbar{display:flex;gap:10px}
 .toolbar button{flex:1;font-family:inherit;font-size:12.5px;font-weight:500;padding:9px 8px;border-radius:99px;border:1px solid var(--hairline);background:var(--surface);color:var(--ink);cursor:pointer;transition:.15s}
 .toolbar button:hover{background:rgba(0,0,0,.04)}
+.hist-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;max-width:1280px}
+.hist-card{background:var(--surface);border:1px solid var(--hairline);border-radius:var(--radius);padding:16px;cursor:pointer;transition:transform .2s,box-shadow .2s;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.hist-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.hist-card .h-date{font-size:14px;font-weight:600;letter-spacing:-.01em}
+.hist-card .h-repo{font-size:11.5px;color:var(--ink-3);margin-top:2px}
+.hist-card .h-stats{display:flex;gap:14px;margin-top:10px;font-size:12.5px;color:var(--ink-2)}
+.hist-card .h-stats b{color:var(--ink)}
+.hist-card .h-open{font-size:11px;color:var(--learning);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.hist-detail{max-width:900px}
+.hist-detail .back{font-family:inherit;font-size:13px;font-weight:500;color:var(--accent);background:none;border:none;cursor:pointer;padding:0;margin-bottom:18px}
+.hist-detail h2{font-size:20px;font-weight:600;letter-spacing:-.02em;margin-bottom:4px}
+.hist-detail .h-meta{font-size:12.5px;color:var(--ink-2);margin-bottom:22px}
+.hist-cols{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media (max-width:800px){.hist-cols{grid-template-columns:1fr}}
+.hist-col{background:var(--surface);border:1px solid var(--hairline);border-radius:18px;padding:16px}
+.hist-col h3{font-size:15px;font-weight:600;margin-bottom:4px}
+.hist-col .hc-sub{font-size:12px;color:var(--ink-3);margin-bottom:12px}
+.hist-col .stack{display:flex;flex-direction:column;gap:6px}
 .toast{position:fixed;bottom:28px;left:50%;transform:translate(-50%,80px);background:rgba(29,29,31,.92);color:#fff;font-size:13px;font-weight:500;padding:10px 20px;border-radius:99px;transition:transform .3s cubic-bezier(.3,.8,.3,1);backdrop-filter:blur(10px);z-index:50}
 .toast.show{transform:translate(-50%,0)}
 .loading{max-width:1280px;margin:80px auto;text-align:center;color:var(--ink-3);font-size:14px}
@@ -104,7 +146,12 @@ button.b-hold:hover{background:rgba(0,0,0,.09)}
       <h1>Pareto Board</h1>
       <div class="subtitle" id="subtitle">loading…</div>
     </div>
-    <div class="meter">
+    <nav class="tabs" id="tabs">
+      <button data-view="prs" class="active">Pull Requests</button>
+      <button data-view="issues">Issues</button>
+      <button data-view="history">History</button>
+    </nav>
+    <div class="meter" id="meter">
       <div class="m-row">
         <div class="m-label"><span id="g-now">0</span> of <span id="g-total">0</span> <span>in Review now</span></div>
         <div class="m-status" id="g-status">Within recommendation</div>
@@ -115,7 +162,13 @@ button.b-hold:hover{background:rgba(0,0,0,.09)}
   </div>
 </header>
 
-<div class="layout" style="display:none" id="layout">
+<div class="session-bar" id="session-bar" style="display:none">
+  <span class="dot"></span>
+  <span id="session-label">Session</span>
+  <button id="btn-finish">Finish session</button>
+</div>
+
+<div class="layout" id="view-prs" style="display:none">
   <main id="bays"></main>
   <aside class="zones">
     <section class="zone" id="zone-now" data-bucket="now">
@@ -133,61 +186,48 @@ button.b-hold:hover{background:rgba(0,0,0,.09)}
     <div class="toolbar">
       <button id="btn-refresh">Refresh</button>
       <button id="btn-export">Copy report</button>
-      <button id="btn-reset">Reset</button>
     </div>
   </aside>
 </div>
-<div class="loading" id="loading">Loading open pull requests…</div>
 
-<div class="toast" id="toast">Report copied</div>
+<div class="layout single" id="view-issues" style="display:none">
+  <main id="issue-bays"></main>
+</div>
+
+<div class="layout single" id="view-history" style="display:none">
+  <main id="history-main"></main>
+</div>
+
+<div class="loading" id="loading">Loading…</div>
+<div class="toast" id="toast">Done</div>
 
 <script>
 const STAGES = {
+  uncategorized:{name:"Uncategorized", c:"var(--uncategorized)", desc:"needs a stage label — classify these"},
   intent:       {name:"Intent",       c:"var(--intent)",       desc:"capturing & protecting what the user wants"},
   execution:    {name:"Execution",    c:"var(--execution)",    desc:"running agents — runners, dispatch, plumbing"},
   judgment:     {name:"Judgment",     c:"var(--judgment)",     desc:"deciding what is true & what gets kept"},
   learning:     {name:"Learning",     c:"var(--learning)",     desc:"what the factory retains & propagates"},
   interface:    {name:"Interface",    c:"var(--interface)",    desc:"how humans drive it"},
-  unclassified: {name:"Unclassified", c:"var(--unclassified)", desc:"no stage label yet"},
 };
+const KINDS = ["capability","fix","hardening","refactor","docs"];
+const FLAGS = ["competing","one-way-door"];
 
-let PRS = [];
-let REPO = "";
-let state = {};
-let serverMode = true;
-const LS_KEY = "rf-pr-buckets-v1";
+let PRS = [], ISSUES = [], REPO = "", SESSION = null, VIEW = "prs";
 const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const TARGET = () => Math.max(1, Math.ceil(PRS.length * 0.2));
+const stageOf = p => STAGES[p.stage] ? p.stage : "uncategorized";
+const fmtDate = ts => ts ? new Date(ts*1000).toLocaleString([], {month:"short", day:"numeric", hour:"numeric", minute:"2-digit"}) : "—";
 
-async function loadState(){
-  try{
-    const r = await fetch("/api/state");
-    if(!r.ok) throw 0;
-    state = await r.json();
-  }catch(_){
-    serverMode = false;
-    state = JSON.parse(localStorage.getItem(LS_KEY) || "{}");
-  }
-}
-let saveTimer = null;
-function save(){
-  if(serverMode){
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => fetch("/api/state", {method:"POST", body:JSON.stringify(state)}).catch(()=>{}), 250);
-  } else {
-    localStorage.setItem(LS_KEY, JSON.stringify(state));
-  }
-}
+async function api(path, opts){ const r = await fetch(path, opts); const d = await r.json(); if(d && d.error) throw new Error(d.error); return d; }
+function toast(msg){ const t = $("#toast"); t.textContent = msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"), 1600); }
 
-async function loadPRs(){
-  const r = await fetch("/api/prs");
-  const data = await r.json();
-  if(data.error) throw new Error(data.error);
-  PRS = data.prs;
-  REPO = data.repo;
-  // drop state entries for PRs that closed
+async function loadAll(){
+  const [prs, session] = await Promise.all([api("/api/prs"), api("/api/session")]);
+  PRS = prs.prs; REPO = prs.repo; SESSION = session;
   const live = new Set(PRS.map(p => String(p.num)));
-  for(const k of Object.keys(state)) if(!live.has(k)) delete state[k];
+  for(const k of Object.keys(SESSION.buckets)) if(!live.has(k)) delete SESSION.buckets[k];
 }
 
 function flagChip(f){
@@ -196,144 +236,257 @@ function flagChip(f){
   return "";
 }
 
-function cardHTML(p, i){
-  return `<article class="card" draggable="true" data-num="${p.num}" style="--d:${i*30}ms">
+function classifyPop(p){
+  const stage = stageOf(p) === "uncategorized" ? "" : p.stage;
+  const opts = (list, sel, group) => list.map(v =>
+    `<button class="opt ${sel===v||(Array.isArray(sel)&&sel.includes(v))?"sel":""}" data-group="${group}" data-val="${v}">${v}</button>`).join("");
+  return `<div class="pop" data-pop="${p.num}">
+    <div class="p-row"><div class="p-cap">Stage</div><div class="opts" data-opts="stage">${opts(Object.keys(STAGES).filter(k=>k!=="uncategorized"), stage, "stage")}</div></div>
+    <div class="p-row"><div class="p-cap">Kind</div><div class="opts" data-opts="kind">${opts(KINDS, p.kind, "kind")}</div></div>
+    <div class="p-row"><div class="p-cap">Flags</div><div class="opts" data-opts="flags">${opts(FLAGS, p.flags, "flags")}</div></div>
+    <div class="p-actions"><button class="p-cancel">Cancel</button><button class="p-apply" data-num="${p.num}">Apply labels</button></div>
+  </div>`;
+}
+
+function cardHTML(p, i, opts={}){
+  const noDesc = p.desc === "Description not yet generated.";
+  const bucketBtns = opts.bucket === false ? "" :
+    `<button class="b-hold" data-act="hold" data-num="${p.num}">Hold</button>
+     <button class="b-now" data-act="now" data-num="${p.num}">Review</button>`;
+  return `<article class="card" draggable="${opts.bucket === false ? "false" : "true"}" data-num="${p.num}" style="--d:${i*30}ms">
     <div class="row1">
       <span class="prnum"><a href="${p.url}" target="_blank" rel="noopener">#${p.num}</a></span>
-      ${p.kind ? `<span class="pill">${p.kind}</span>` : ""}
+      ${p.kind ? `<span class="pill">${esc(p.kind)}</span>` : ""}
       ${p.flags.map(flagChip).join("")}
       <a class="ext" href="${p.url}" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
     </div>
     <div class="title">${esc(p.title)}</div>
-    <div class="desc">${esc(p.desc)}</div>
+    <div class="desc ${noDesc ? "placeholder" : ""}">${esc(p.desc)}</div>
     <div class="row2">
       <span class="author">${esc(p.author)}</span>
       <span class="btns">
-        <button class="b-hold" data-act="hold" data-num="${p.num}">Hold</button>
-        <button class="b-now" data-act="now" data-num="${p.num}">Review</button>
+        <button class="b-classify" data-act="classify" data-num="${p.num}">${stageOf(p)==="uncategorized" ? "Classify" : "Edit labels"}</button>
+        ${bucketBtns}
       </span>
     </div>
   </article>`;
 }
 
-function miniHTML(p){
-  const c = (STAGES[p.stage] || STAGES.unclassified).c;
-  return `<div class="mini" draggable="true" data-num="${p.num}" style="--stage-c:${c}">
+function miniHTML(p, ro=false){
+  const c = (STAGES[stageOf(p)]).c;
+  return `<div class="mini ${ro?"ro":""}" ${ro?"":'draggable="true"'} data-num="${p.num}" style="--stage-c:${c}">
     <span class="dot"></span>
     <span class="prnum">#${p.num}</span>
     <span class="t">${esc(p.title)}</span>
-    <a href="${p.url}" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
-    <button data-act="back" data-num="${p.num}" title="Send back">✕</button>
+    <a href="${p.url||"#"}" target="_blank" rel="noopener" title="Open on GitHub">↗</a>
+    ${ro ? "" : `<button data-act="back" data-num="${p.num}" title="Send back">✕</button>`}
   </div>`;
 }
 
-function esc(s){ return String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
-
-function render(){
-  $("#subtitle").innerHTML = `${esc(REPO)} · <span class="live">live</span> · sort into Review now or Hold`;
+function baysHTML(items, opts={}){
   let html = "";
   for(const [key, s] of Object.entries(STAGES)){
-    const all = PRS.filter(p => (p.stage === key) || (key === "unclassified" && !STAGES[p.stage]));
+    const all = items.filter(p => stageOf(p) === key);
     if(!all.length) continue;
-    const items = all.filter(p => !state[p.num]);
+    const unsorted = opts.bucket === false ? all : all.filter(p => !SESSION.buckets[p.num]);
     html += `<section class="bay" style="--bay-c:${s.c}">
-      <div class="bay-head"><span class="dot"></span><h2>${s.name}</h2><span class="count">${items.length} of ${all.length}</span><span class="desc">${s.desc}</span></div>
-      ${items.length
-        ? `<div class="bay-cards">${items.map((p,i)=>cardHTML(p,i)).join("")}</div>`
+      <div class="bay-head"><span class="dot"></span><h2>${s.name}</h2><span class="count">${unsorted.length} of ${all.length}</span><span class="desc">${s.desc}</span></div>
+      ${unsorted.length
+        ? `<div class="bay-cards">${unsorted.map((p,i)=>cardHTML(p,i,opts)).join("")}</div>`
         : `<div class="bay-empty">All sorted</div>`}
     </section>`;
   }
-  $("#bays").innerHTML = html;
+  return html || `<div class="bay-empty">Nothing open</div>`;
+}
 
-  const nows  = PRS.filter(p => state[p.num] === "now");
-  const holds = PRS.filter(p => state[p.num] === "hold");
-  $("#body-now").innerHTML  = nows.length  ? nows.map(miniHTML).join("")  : `<div class="z-hint">Drag cards here</div>`;
-  $("#body-hold").innerHTML = holds.length ? holds.map(miniHTML).join("") : `<div class="z-hint">Drag cards here</div>`;
-  $("#c-now").textContent  = nows.length;
-  $("#c-hold").textContent = holds.length;
+function render(){
+  $("#subtitle").textContent = REPO + " · live";
+  $("#meter").style.display = VIEW === "prs" ? "" : "none";
+  $("#session-bar").style.display = VIEW === "prs" ? "" : "none";
+  $("#view-prs").style.display = VIEW === "prs" ? "" : "none";
+  $("#view-issues").style.display = VIEW === "issues" ? "" : "none";
+  $("#view-history").style.display = VIEW === "history" ? "" : "none";
+  $("#loading").style.display = "none";
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("active", b.dataset.view === VIEW));
+  if(VIEW === "prs") renderPRs();
+}
+
+function renderPRs(){
+  $("#session-label").textContent = `Session started ${fmtDate(SESSION.started_at)} · sorting resets each session, labels are permanent`;
+  $("#bays").innerHTML = baysHTML(PRS);
+
+  const nows  = PRS.filter(p => SESSION.buckets[p.num] === "now");
+  const holds = PRS.filter(p => SESSION.buckets[p.num] === "hold");
+  $("#body-now").innerHTML  = nows.length  ? nows.map(p=>miniHTML(p)).join("")  : `<div class="z-hint">Drag cards here</div>`;
+  $("#body-hold").innerHTML = holds.length ? holds.map(p=>miniHTML(p)).join("") : `<div class="z-hint">Drag cards here</div>`;
+  $("#c-now").textContent = nows.length; $("#c-hold").textContent = holds.length;
   $("#quota-now").innerHTML = `<b>${nows.length} of ${TARGET()}</b> recommended`;
   $("#zone-now").classList.toggle("over-quota", nows.length > TARGET());
 
   const pct = PRS.length ? (nows.length / PRS.length) * 100 : 0;
-  $("#g-now").textContent = nows.length;
-  $("#g-total").textContent = PRS.length;
+  $("#g-now").textContent = nows.length; $("#g-total").textContent = PRS.length;
   $("#g-target").textContent = TARGET();
   const fill = $("#g-fill");
   fill.style.width = Math.min(pct, 100) + "%";
   fill.classList.toggle("over", nows.length > TARGET());
   $("#g-unsorted").textContent = `${PRS.length - nows.length - holds.length} unsorted`;
-  const st = $("#g-status");
-  st.classList.remove("warn","over");
+  const st = $("#g-status"); st.classList.remove("warn","over");
   if(nows.length > TARGET()){ st.classList.add("over"); st.textContent = "Over recommendation — consider trimming"; }
   else if(nows.length === TARGET()){ st.classList.add("warn"); st.textContent = "At recommendation"; }
   else { st.textContent = "Within recommendation"; }
-
   bindDnD();
 }
 
-function setBucket(num, bucket){
-  if(bucket) state[num] = bucket; else delete state[num];
-  save(); render();
+async function renderIssues(){
+  $("#issue-bays").innerHTML = `<div class="bay-empty">Loading issues…</div>`;
+  try{
+    const d = await api("/api/issues");
+    ISSUES = d.issues;
+    $("#issue-bays").innerHTML = baysHTML(ISSUES, {bucket:false});
+  }catch(e){
+    $("#issue-bays").innerHTML = `<div class="bay-empty">Couldn't load issues: ${esc(e.message)}</div>`;
+  }
+}
+
+async function renderHistory(){
+  const main = $("#history-main");
+  main.innerHTML = `<div class="bay-empty">Loading sessions…</div>`;
+  const sessions = await api("/api/sessions");
+  if(!sessions.length){ main.innerHTML = `<div class="bay-empty">No sessions yet</div>`; return; }
+  main.innerHTML = `<div class="hist-list">` + sessions.slice().reverse().map(s => `
+    <div class="hist-card" data-sid="${s.id}">
+      <div class="h-date">${fmtDate(s.started_at)}</div>
+      <div class="h-repo">${esc(s.repo)}${s.note ? " · " + esc(s.note) : ""}</div>
+      <div class="h-stats"><span><b>${s.now}</b> review</span><span><b>${s.hold}</b> hold</span>
+      ${s.finished_at ? `<span style="margin-left:auto;color:var(--ink-3)">finished ${fmtDate(s.finished_at)}</span>` : `<span class="h-open" style="margin-left:auto">active</span>`}</div>
+    </div>`).join("") + `</div>`;
+}
+
+async function renderHistoryDetail(sid){
+  const s = await api("/api/sessions/" + sid);
+  const get = n => s.snapshot[n] || {num:n, title:"(no snapshot)", stage:"uncategorized", url:"#", flags:[]};
+  const nows  = Object.keys(s.buckets).filter(n => s.buckets[n] === "now").map(get);
+  const holds = Object.keys(s.buckets).filter(n => s.buckets[n] === "hold").map(get);
+  $("#history-main").innerHTML = `<div class="hist-detail">
+    <button class="back" id="hist-back">‹ All sessions</button>
+    <h2>Session · ${fmtDate(s.started_at)}</h2>
+    <div class="h-meta">${esc(s.repo)} · ${s.finished_at ? "finished " + fmtDate(s.finished_at) : "still active"}</div>
+    <div class="hist-cols">
+      <div class="hist-col"><h3>Review now</h3><div class="hc-sub">${nows.length} PRs</div><div class="stack">${nows.map(p=>miniHTML(p,true)).join("") || `<div class="z-hint">none</div>`}</div></div>
+      <div class="hist-col"><h3>Hold</h3><div class="hc-sub">${holds.length} PRs</div><div class="stack">${holds.map(p=>miniHTML(p,true)).join("") || `<div class="z-hint">none</div>`}</div></div>
+    </div></div>`;
+  $("#hist-back").addEventListener("click", renderHistory);
+}
+
+async function setBucket(num, bucket){
+  SESSION = await api("/api/session/bucket", {method:"POST", body:JSON.stringify({num, bucket})});
+  renderPRs();
 }
 
 function bindDnD(){
-  document.querySelectorAll("[draggable]").forEach(el => {
-    el.addEventListener("dragstart", e => {
-      e.dataTransfer.setData("text/plain", el.dataset.num);
-      el.classList.add("dragging");
-    });
+  document.querySelectorAll('#view-prs [draggable="true"]').forEach(el => {
+    el.addEventListener("dragstart", e => { e.dataTransfer.setData("text/plain", el.dataset.num); el.classList.add("dragging"); });
     el.addEventListener("dragend", () => el.classList.remove("dragging"));
   });
 }
 
-document.addEventListener("click", e => {
-  const b = e.target.closest("button[data-act]");
-  if(!b) return;
-  const {act, num} = b.dataset;
-  setBucket(num, act === "back" ? null : act);
-});
-
 [["#zone-now","now"],["#zone-hold","hold"],["#bays",null]].forEach(([sel, bucket]) => {
   const el = document.querySelector(sel);
-  el.addEventListener("dragover", e => { e.preventDefault(); el.classList && el.classList.add("dragover"); });
-  el.addEventListener("dragleave", () => el.classList && el.classList.remove("dragover"));
+  el.addEventListener("dragover", e => { e.preventDefault(); el.classList.add("dragover"); });
+  el.addEventListener("dragleave", () => el.classList.remove("dragover"));
   el.addEventListener("drop", e => {
-    e.preventDefault(); el.classList && el.classList.remove("dragover");
+    e.preventDefault(); el.classList.remove("dragover");
     const num = e.dataTransfer.getData("text/plain");
-    if(num) setBucket(num, bucket);
+    if(num) setBucket(Number(num), bucket);
   });
 });
 
-$("#btn-reset").addEventListener("click", () => {
-  if(confirm("Clear all sorting and start over?")){ state = {}; save(); render(); }
-});
-$("#btn-refresh").addEventListener("click", async () => {
-  await loadPRs().catch(()=>{}); render();
+document.addEventListener("click", async e => {
+  const opt = e.target.closest(".pop .opt");
+  if(opt){
+    if(opt.dataset.group === "flags") opt.classList.toggle("sel");
+    else { opt.parentElement.querySelectorAll(".opt").forEach(o=>o.classList.remove("sel")); opt.classList.add("sel"); }
+    return;
+  }
+  if(e.target.closest(".p-cancel")){ document.querySelectorAll(".pop").forEach(p=>p.remove()); return; }
+  const apply = e.target.closest(".p-apply");
+  if(apply){
+    const pop = apply.closest(".pop");
+    const num = Number(apply.dataset.num);
+    const item = [...PRS, ...ISSUES].find(p => p.num === num);
+    const sel = g => [...pop.querySelectorAll(`[data-opts="${g}"] .opt.sel`)].map(o=>o.dataset.val);
+    const stage = sel("stage")[0], kind = sel("kind")[0], flags = sel("flags");
+    const add = [], remove = [];
+    if(stage && stage !== item.stage){ add.push(`stage:${stage}`); if(STAGES[item.stage] && item.stage !== "uncategorized") remove.push(`stage:${item.stage}`); }
+    if(kind && kind !== item.kind){ add.push(`kind:${kind}`); if(item.kind) remove.push(`kind:${item.kind}`); }
+    for(const f of FLAGS){
+      if(flags.includes(f) && !item.flags.includes(f)) add.push(f);
+      if(!flags.includes(f) && item.flags.includes(f)) remove.push(f);
+    }
+    if(!add.length && !remove.length){ pop.remove(); return; }
+    apply.disabled = true; apply.textContent = "Applying…";
+    try{
+      await api("/api/labels", {method:"POST", body:JSON.stringify({num, add, remove})});
+      toast(`Labels updated on #${num}`);
+      if(VIEW === "prs"){ const d = await api("/api/prs"); PRS = d.prs; renderPRs(); }
+      else { await renderIssues(); }
+    }catch(err){ toast("Label update failed: " + err.message); apply.disabled = false; apply.textContent = "Apply labels"; }
+    return;
+  }
+  const b = e.target.closest("button[data-act]");
+  if(!b) return;
+  const num = Number(b.dataset.num);
+  if(b.dataset.act === "classify"){
+    document.querySelectorAll(".pop").forEach(p=>p.remove());
+    const item = [...PRS, ...ISSUES].find(p => p.num === num);
+    b.closest(".card").insertAdjacentHTML("beforeend", classifyPop(item));
+    return;
+  }
+  if(b.dataset.act === "back") setBucket(num, null);
+  else if(b.dataset.act === "now" || b.dataset.act === "hold") setBucket(num, b.dataset.act);
 });
 
+$("#tabs").addEventListener("click", e => {
+  const b = e.target.closest("button[data-view]");
+  if(!b) return;
+  VIEW = b.dataset.view;
+  render();
+  if(VIEW === "issues") renderIssues();
+  if(VIEW === "history") renderHistory();
+});
+document.addEventListener("click", e => {
+  const hc = e.target.closest(".hist-card");
+  if(hc) renderHistoryDetail(hc.dataset.sid);
+});
+
+$("#btn-finish").addEventListener("click", async () => {
+  const nows = Object.values(SESSION.buckets).filter(v=>v==="now").length;
+  const holds = Object.values(SESSION.buckets).filter(v=>v==="hold").length;
+  if(!confirm(`Finish this session?\n\n${nows} in Review now, ${holds} on Hold.\nThe next session starts with empty buckets. This one stays in History.`)) return;
+  await api("/api/session/finish", {method:"POST", body:"{}"});
+  await loadAll(); render(); toast("Session archived — fresh one started");
+});
+$("#btn-refresh").addEventListener("click", async () => { await loadAll(); render(); });
 $("#btn-export").addEventListener("click", async () => {
   const d = new Date().toISOString().slice(0,10);
-  const nows  = PRS.filter(p => state[p.num] === "now");
-  const holds = PRS.filter(p => state[p.num] === "hold");
-  const uns   = PRS.filter(p => !state[p.num]);
-  const line = p => `- #${p.num} [${p.stage}${p.kind ? "/" + p.kind : ""}${p.flags.length ? " · " + p.flags.join(",") : ""}] ${p.title} — ${p.url}`;
+  const nows  = PRS.filter(p => SESSION.buckets[p.num] === "now");
+  const holds = PRS.filter(p => SESSION.buckets[p.num] === "hold");
+  const uns   = PRS.filter(p => !SESSION.buckets[p.num]);
+  const line = p => `- #${p.num} [${stageOf(p)}${p.kind ? "/" + p.kind : ""}${p.flags.length ? " · " + p.flags.join(",") : ""}] ${p.title} — ${p.url}`;
   const md = `# ${REPO} PR triage — review now vs hold (${d})\n\n` +
     `## Review now (${nows.length} / target ≤${TARGET()})\n${nows.map(line).join("\n") || "- (none)"}\n\n` +
     `## Hold (${holds.length})\n${holds.map(line).join("\n") || "- (none)"}\n\n` +
     (uns.length ? `## Unsorted (${uns.length})\n${uns.map(line).join("\n")}\n` : "");
   await navigator.clipboard.writeText(md);
-  const t = $("#toast"); t.classList.add("show"); setTimeout(()=>t.classList.remove("show"), 1600);
+  toast("Report copied");
 });
 
 (async function init(){
-  await loadState();
   try{
-    await loadPRs();
-    $("#loading").style.display = "none";
-    $("#layout").style.display = "";
+    await loadAll();
     render();
   }catch(e){
-    $("#loading").textContent = "Couldn't load PRs: " + e.message + " — is server.py running?";
+    $("#loading").textContent = "Couldn't load: " + e.message + " — is server.py running?";
   }
 })();
 </script>
