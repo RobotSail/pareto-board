@@ -41,7 +41,7 @@ STAGE_LABELS = ["stage:intent", "stage:execution", "stage:judgment",
                 "stage:learning", "stage:interface"]
 KIND_LABELS = ["kind:capability", "kind:fix", "kind:hardening",
                "kind:refactor", "kind:docs"]
-FLAG_LABELS = ["competing", "one-way-door"]
+FLAG_LABELS = ["competing", "one-way-door", "backlog"]
 
 _cache = {}  # key -> {"at": ts, "data": ...}
 CACHE_TTL = 60
@@ -128,9 +128,20 @@ def _cached(key, fetch):
     return data
 
 
+def _github_paged(path_base):
+    """Fetch all pages of a GitHub list endpoint."""
+    out, page = [], 1
+    while True:
+        batch = _github("GET", f"{path_base}&per_page=100&page={page}")
+        out.extend(batch)
+        if len(batch) < 100:
+            return out
+        page += 1
+
+
 def _fetch_prs():
     def go():
-        raw = _github("GET", f"repos/{REPO}/pulls?state=open&per_page=100")
+        raw = _github_paged(f"repos/{REPO}/pulls?state=open")
         meta = _meta()
         return {"repo": REPO, "fetched_at": time.time(),
                 "prs": [_shape(p, meta) for p in raw]}
@@ -139,7 +150,7 @@ def _fetch_prs():
 
 def _fetch_issues():
     def go():
-        raw = _github("GET", f"repos/{REPO}/issues?state=open&per_page=100")
+        raw = _github_paged(f"repos/{REPO}/issues?state=open")
         meta = _meta()
         items = [i for i in raw if "pull_request" not in i]
         return {"repo": REPO, "fetched_at": time.time(),

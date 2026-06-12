@@ -212,7 +212,7 @@ const STAGES = {
   interface:    {name:"Interface",    c:"var(--interface)",    desc:"how humans drive it"},
 };
 const KINDS = ["capability","fix","hardening","refactor","docs"];
-const FLAGS = ["competing","one-way-door"];
+const FLAGS = ["competing","one-way-door","backlog"];
 
 let PRS = [], ISSUES = [], REPO = "", SESSION = null, VIEW = "prs";
 const $ = s => document.querySelector(s);
@@ -234,6 +234,7 @@ async function loadAll(){
 function flagChip(f){
   if(f === "competing")    return `<span class="pill competing">Duplicate set</span>`;
   if(f === "one-way-door") return `<span class="pill door">Owner call</span>`;
+  if(f === "backlog")      return `<span class="pill">Backlog</span>`;
   return "";
 }
 
